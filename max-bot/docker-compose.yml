@@ -1,0 +1,58 @@
+services:
+  ai:
+    image: cr.selcloud.ru/umap/ai-assistant:v1.2.15
+    container_name: max-ai
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      YANDEX_API_KEY: "input_your_yandex_api_key"
+      YANDEX_CATALOG_ID: "input_your_yandex_catalog_id"
+
+      POSTGRES_HOST: psql
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: aidb-owner
+      POSTGRES_PASSWORD: sGyA3PqUwYFd
+      POSTGRES_DB: aidb
+
+    restart: always
+    volumes:
+      - ./data_holder:/app/data_holder
+    networks: [ bot-network ]
+  bot:
+    build: .
+    container_name: max-bot
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+#      - MAX_API_TOKEN=f9LHodD0cOL3_TwP2Hl6qNG_NkbLw6zXMBdRE85Nc6VKe9Nl2aKdIPVs4UvB3GtcvAJC4aTOXnLwUaJPE9EU
+#      - AI_API_URL=http://localhost:8000
+#      - AI_API_TOKEN=${AI_API_TOKEN}
+#      - DATABASE_URL=sqlite:///app/data/db.sqlite3
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./configs:/app/configs:ro
+    depends_on:
+      - psql
+    networks: [ bot-network ]
+
+  # Опциональная PostgreSQL база данных (если нужна вместо SQLite)
+  psql:
+    image: postgresql-local:15-vector
+    container_name: psql
+    networks: [ bot-network ]
+    restart: always
+    environment:
+#      - POSTGRES_DB=tgbotdb
+#      - POSTGRES_USER=tgbotdb-owner
+      - POSTGRES_PASSWORD=XVm7dubsG6qw
+#      - LANG=ru_RU.utf8
+      - POSTGRES_INITDB_ARGS=--locale-provider=icu --icu-locale=en
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+networks:
+  bot-network:
+    driver: bridge

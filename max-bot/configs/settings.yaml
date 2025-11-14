@@ -1,0 +1,17 @@
+MAX:
+  # Токен бота MAX (получить в https://dev.max.ru/)
+  token: "f9LHodD0cOL3_TwP2Hl6qNG_NkbLw6zXMBdRE85Nc6VKe9Nl2aKdIPVs4UvB3GtcvAJC4aTOXnLwUaJPE9EU"
+
+Postgres: 
+  port: 5432
+  user: "postgres"
+  host: "localhost"
+  password: "example"
+  database: "max_bot"
+
+AIServer:
+  port: 9000
+  host: "http://127.0.0.1"
+  # Глобальная переменная для включения/отключения запросов к AI серверу
+  ai_enabled: true
+

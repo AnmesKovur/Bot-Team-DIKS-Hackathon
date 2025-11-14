@@ -1,0 +1,40 @@
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Тесты
+test_*.py
+tests/
+*.log
+
+# Документация
+*.md
+docs/
+
+# Временные файлы
+*.tmp
+.DS_Store
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Конфигурация (будет монтироваться отдельно)
+.env
+configs/settings_override.yaml

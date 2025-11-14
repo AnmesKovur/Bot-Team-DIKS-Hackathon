@@ -1,0 +1,320 @@
+max-bot/
+│
+├── ai-assistant/                 # AI Assistant микросервис (FastAPI)
+│   ├── __init__.py
+│   ├── main.py                   # Точка входа FastAPI приложения
+│   ├── requirements.txt          # Python зависимости AI Assistant
+│   ├── Dockerfile                # Docker образ AI Assistant
+│   ├── alembic.ini               # Конфигурация Alembic (миграции)
+│   ├── core.py                   # Ядро приложения
+│   ├── models.py                 # Pydantic модели для API
+│   ├── db_manager.py             # Менеджер баз данных (legacy JSON)
+│   │
+│   ├── api/                      # REST API эндпоинты
+│   │   ├── __init__.py
+│   │   ├── faq.py                # CRUD API для FAQ
+│   │   ├── search.py             # Семантический поиск (FAQ/компании/продукты)
+│   │   ├── companies.py          # API для поиска компаний
+│   │   ├── products.py           # API для поиска продуктов
+│   │   ├── questions.py          # API вопросов (legacy)
+│   │   └── flow_manager.py       # API управления потоками диалогов
+│   │
+│   ├── database/                 # SQLAlchemy база данных
+│   │   ├── __init__.py
+│   │   ├── models.py             # SQLAlchemy модели (FAQ)
+│   │   └── session.py            # Сессии и подключение к БД
+│   │
+│   ├── services/                 # Бизнес-логика
+│   │   ├── __init__.py
+│   │   └── faq_service.py        # Сервис для работы с FAQ
+│   │
+│   ├── utils/                    # Утилиты AI Assistant
+│   │   ├── __init__.py
+│   │   ├── logger.py             # Логирование
+│   │   ├── search_utils.py       # Алгоритмы поиска (векторный, fuzzy)
+│   │   └── text_utils.py         # Обработка текста (эмбеддинги, лемматизация)
+│   │
+│   ├── alembic/                  # Миграции базы данных
+│   │   ├── env.py                # Окружение Alembic
+│   │   ├── README                # Документация миграций
+│   │   ├── script.py.mako        # Шаблон миграции
+│   │   └── versions/             # Версии миграций
+│   │       └── 578860e323e4_initial_schema_with_pgvector_768.py
+│   │
+│   ├── scripts/                  # Вспомогательные скрипты
+│   │   ├── __init__.py
+│   │   └── import_faq_to_sqlalchemy.py  # Импорт FAQ из txt в PostgreSQL
+│   │
+│   └── data_holder/              # Статические данные
+│       ├── faq.txt               # База FAQ (текстовый формат)
+│       ├── companies_db.json     # База компаний
+│       ├── products_db.json      # База продуктов
+│       └── prompt.txt            # Промпт для YandexGPT
+│
+├── clients/                      # Клиенты для внешних сервисов
+│   ├── __init__.py
+│   └── ai/                       # AI клиент
+│       ├── __init__.py
+│       └── client.py             # HTTP клиент для AI Assistant API
+│
+├── common/                       # Общие утилиты
+│   ├── __init__.py
+│   ├── logger.py                 # Настройка логирования
+│   └── utils.py                  # Вспомогательные функции
+│
+├── configs/                      # Конфигурация
+│   ├── __init__.py
+│   ├── config.py                 # Загрузка настроек через Dynaconf
+│   ├── settings.yaml             # Базовые настройки
+│   ├── settings_override.yaml    # Персональные настройки (не в git)
+│   ├── settings_override.yaml.example  # Пример персональных настроек
+│   ├── flow.json                 # Конфигурация меню и флоу
+│   └── flow.json.example         # Пример конфигурации флоу
+│
+├── core/                         # Основная логика бота
+│   ├── __init__.py
+│   ├── base.py                   # Базовые классы для всех обработчиков
+│   │                             # - BaseResponse (отправка сообщений)
+│   │                             # - BaseCommand (команды)
+│   │                             # - BaseCallback (callback обработчики)
+│   │                             # - BaseHandler (обработчики сообщений)
+│   │                             # - BaseChatHandler (чат с AI)
+│   │
+│   ├── bot.py                    # Основной класс MaxBot
+│   │                             # - Регистрация обработчиков
+│   │                             # - Роутинг обновлений
+│   │                             # - Управление webhook
+│   │
+│   ├── callbacks.py              # Обработчики callback запросов
+│   │                             # - ExitCallback (кнопка "Назад")
+│   │                             # - HideMessageCallback (кнопка "Скрыть")
+│   │                             # - PaginationCallback (навигация по результатам)
+│   │
+│   ├── commands.py               # Обработчики команд
+│   │                             # - StartCommand (/start)
+│   │                             # - ResetCommand (/reset)
+│   │
+│   ├── decorators.py             # Middleware декораторы
+│   │                             # - @middleware (автосохранение состояния)
+│   │
+│   ├── handlers.py               # Обработчики сообщений
+│   │                             # - StaticHandler (статический контент)
+│   │                             # - ExtendedStaticHandler (с клавиатурой)
+│   │                             # - ManagedHandler (режим поиска)
+│   │                             # - ChatHandler (обработка с AI)
+│   │
+│   ├── keyboard.py               # Утилиты для клавиатур
+│   │                             # - build_keyboard (reply клавиатура)
+│   │                             # - build_inline_keyboard (inline клавиатура)
+│   │                             # - add_button_to_inline_markup
+│   │
+│   ├── max_client.py             # Клиент MAX API
+│   │                             # - MaxClient (HTTP клиент)
+│   │                             # - MaxWebhookHandler (обработка webhook)
+│   │
+│   ├── response_builder.py       # Построение ответов
+│   │                             # - card_from_json (форматирование карточек)
+│   │
+│   ├── schemas.py                # Pydantic схемы
+│   │                             # - User, Button, InlineButton
+│   │                             # - MaxUpdate, MaxMessage, MaxUser...
+│   │
+│   ├── types.py                  # Типы данных
+│   │                             # - Menus (TypeAlias)
+│   │
+│   └── utils.py                  # Вспомогательные функции
+│                                 # - load_json_with_references
+│                                 # - build_shared_data
+│                                 # - extract_user_id_from_update
+│
+├── database/                     # База данных
+│   ├── __init__.py
+│   ├── config.py                 # Конфигурация Tortoise ORM
+│   │                             # - TORTOISE_ORM
+│   │                             # - init_db()
+│   │
+│   ├── crud.py                   # CRUD операции
+│   │                             # - get_or_create_user()
+│   │                             # - update_user_state()
+│   │                             # - save_message()
+│   │
+│   ├── models.py                 # ORM модели
+│   │                             # - UserModel
+│   │                             # - UserStateModel
+│   │                             # - MessageModel
+│   │
+│   └── schemas.py                # Pydantic схемы для БД
+│                                 # - DBUser, DBUserState, DBMessage
+│
+├── migrations/                   # Миграции базы данных (Aerich)
+│   └── models/
+│       └── (файлы миграций)
+│
+├── logs/                         # Логи (создается автоматически)
+│   └── bot.log
+│
+├── main.py                       # Точка входа приложения
+│                                 # - Инициализация БД
+│                                 # - Создание бота
+│                                 # - Запуск webhook сервера
+│
+├── requirements.txt              # Python зависимости (полный список)
+├── requirements.in               # Python зависимости (для pip-compile)
+├── pyproject.toml                # Конфигурация проекта (Aerich, Black, mypy)
+│
+├── Dockerfile                    # Docker образ для бота
+├── docker-compose.yml            # Docker Compose конфигурация
+├── entrypoint.sh                 # Скрипт запуска в Docker
+├── .dockerignore                 # Исключения для Docker
+├── .gitignore                    # Исключения для Git
+│
+└── docs/                         # Документация
+    ├── README.md                 # Основная документация
+    ├── INSTALLATION.md           # Инструкция по установке
+    ├── QUICKSTART.md             # Быстрый старт
+    ├── MIGRATION_FROM_TELEGRAM.md # Миграция с Telegram
+    ├── PROJECT_OVERVIEW.md       # Обзор проекта
+    ├── COMMANDS_REFERENCE.md     # Справочник команд
+    ├── CHANGELOG.md              # История изменений
+    └── PROJECT_STRUCTURE.txt     # Этот файл
+
+
+═══════════════════════════════════════════════════════════════════
+
+КЛЮЧЕВЫЕ ФАЙЛЫ:
+
+🚀 Запуск:
+   main.py                        - Точка входа MAX Bot
+   ai-assistant/main.py           - Точка входа AI Assistant
+
+⚙️ Конфигурация:
+   configs/settings.yaml          - Основные настройки бота
+   configs/flow.json              - Конфигурация меню бота
+   ai-assistant/alembic.ini       - Конфигурация миграций AI
+   docker-compose.yml             - Конфигурация Docker сервисов
+
+🤖 Основная логика бота:
+   core/bot.py                    - Главный класс бота
+   core/handlers.py               - Обработчики сообщений
+   core/max_client.py             - MAX API клиент
+
+🧠 AI Assistant:
+   ai-assistant/api/search.py     - API семантического поиска
+   ai-assistant/api/faq.py        - CRUD API для FAQ
+   ai-assistant/utils/text_utils.py    - Эмбеддинги и обработка текста
+   ai-assistant/services/faq_service.py - Сервис FAQ
+
+💾 База данных:
+   database/models.py             - ORM модели бота (Tortoise)
+   database/crud.py               - CRUD операции бота
+   ai-assistant/database/models.py     - ORM модели AI (SQLAlchemy)
+   ai-assistant/alembic/versions/      - Миграции PostgreSQL
+
+📊 Данные:
+   ai-assistant/data_holder/faq.txt        - База FAQ
+   ai-assistant/data_holder/companies_db.json - База компаний
+   ai-assistant/data_holder/products_db.json  - База продуктов
+
+📄 Документация:
+   README.md              - Начните отсюда!
+   QUICKSTART.md          - Быстрый старт
+   ai-assistant/README.md - Документация AI Assistant
+
+═══════════════════════════════════════════════════════════════════
+
+КОЛИЧЕСТВО ФАЙЛОВ ПО ТИПАМ:
+
+MAX Bot:
+  Python модули:       35
+  Конфигурация:        6
+  Документация:        3
+  Docker:              2
+
+AI Assistant:
+  Python модули:       15
+  Конфигурация:        2
+  Миграции:            1
+  Документация:        1
+  Docker:              1
+  Данные:              4
+
+Общие файлы:
+  Docker Compose:      1
+  Другое:              3
+
+ВСЕГО:                 ~74 файла
+
+═══════════════════════════════════════════════════════════════════
+
+РАЗМЕР КОДОВОЙ БАЗЫ (приблизительно):
+
+MAX Bot:
+  Python код:          ~3000 строк
+  Конфигурация:        ~150 строк
+
+AI Assistant:
+  Python код:          ~2000 строк
+  Миграции:            ~100 строк
+  Данные FAQ:          ~500 строк
+
+Документация:          ~3500 строк
+
+ВСЕГО:                 ~9250 строк
+
+═══════════════════════════════════════════════════════════════════
+
+КОМПОНЕНТЫ СИСТЕМЫ:
+
+┌─────────────────────────────────────────────────────────────────┐
+│                          MAX Bot System                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐         ┌──────────────┐                     │
+│  │   MAX Bot    │────────▶│ MAX Platform │                     │
+│  │  (Python)    │         │     API      │                     │
+│  └──────┬───────┘         └──────────────┘                     │
+│         │                                                        │
+│         │                                                        │
+│         │ HTTP API                                              │
+│         ▼                                                        │
+│  ┌──────────────┐         ┌──────────────┐                     │
+│  │AI Assistant  │────────▶│  PostgreSQL  │                     │
+│  │  (FastAPI)   │         │  + pgvector  │                     │
+│  └──────────────┘         └──────────────┘                     │
+│         │                                                        │
+│         ├─ Семантический поиск (sentence-transformers)          │
+│         ├─ FAQ база знаний                                     │
+│         ├─ Поиск компаний/продуктов                            │
+│         └─ Интеграция с YandexGPT (опционально)                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+ИСПОЛЬЗУЕМЫЕ ТЕХНОЛОГИИ:
+
+MAX Bot:
+  - Python 3.12
+  - aiogram-подобная архитектура (адаптирована для MAX)
+  - Tortoise ORM
+  - SQLite / PostgreSQL
+  - Long Polling
+
+AI Assistant:
+  - Python 3.12
+  - FastAPI
+  - SQLAlchemy 2.0
+  - PostgreSQL + pgvector
+  - sentence-transformers (ML модели):
+    * all-mpnet-base-v2 (768 dim)
+    * all-MiniLM-L6-v2
+  - Yandex Cloud ML SDK (опционально)
+  - pymorphy3 (лемматизация)
+  - Levenshtein (fuzzy search)
+
+Общие:
+  - Docker & Docker Compose
+  - Pydantic для валидации
+  - httpx для HTTP клиентов
+  - Python logging
+
+═══════════════════════════════════════════════════════════════════
+

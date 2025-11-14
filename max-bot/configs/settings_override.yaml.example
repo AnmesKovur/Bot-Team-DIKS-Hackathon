@@ -1,0 +1,15 @@
+# Пример файла с переопределением настроек
+# Скопируйте этот файл в settings_override.yaml и измените значения
+
+MAX:
+  token: "ваш_токен_max_бота"
+  webhook_url: "https://yourdomain.com/webhook"
+
+Postgres:
+  password: "ваш_пароль"
+  database: "max_bot_production"
+
+AIServer:
+  host: "http://your-ai-server.com"
+  port: 9000
+

@@ -1,0 +1,12 @@
+# Основные зависимости проекта
+# Используйте pip-compile для генерации requirements.txt
+
+aiohttp
+tortoise-orm[asyncpg]
+aerich[toml]
+dynaconf
+tenacity
+pydantic
+httpx[http2,socks]
+cryptography
+
